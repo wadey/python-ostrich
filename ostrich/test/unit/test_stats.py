@@ -138,7 +138,9 @@ class StatsTest(unittest.TestCase):
         @stats.gauge("pi")
         def _pi():
             return math.pi
-        self.assertEquals({"pi": math.pi}, stats.get_gauge_stats())
+        
+        stats.make_gauge("e", lambda: math.e)
+        self.assertEquals({"e": math.e, "pi": math.pi}, stats.get_gauge_stats())
     
     def test_gauge_update(self):
         potatoes = [100.0]
