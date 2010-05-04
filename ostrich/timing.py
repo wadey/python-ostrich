@@ -89,7 +89,7 @@ class TimingStat(object):
         return dict(count=self.count, maximum=self.max, minimum=self.min,
                     average=self.average, standard_deviation=long(self.std_dev))
     
-    def to_dict(self):
+    def to_dict(self, percentiles=True, raw_histogram=False):
         d = self.to_dict_no_histogram()
         if self.histogram:
             h = self.histogram
@@ -100,6 +100,12 @@ class TimingStat(object):
                      p99=h.get_percentile(0.99),
                      p999=h.get_percentile(0.999),
                      p9999=h.get_percentile(0.9999))
+            if raw_histogram:
+                # strip off all the zeros at the end of the histogram
+                histogram = list(h.buckets)
+                while histogram and histogram[-1] == 0:
+                    histogram = histogram[:-1]
+                d.update(histogram=histogram)
         return d
     
     def __str__(self):

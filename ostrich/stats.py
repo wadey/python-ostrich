@@ -1,5 +1,6 @@
 from ostrich.stats_provider import StatsProvider
 from ostrich.stats_collection import StatsCollection
+from ostrich.timing import TimingStat
 
 class Stats(StatsProvider):
     def __init__(self):
@@ -52,6 +53,12 @@ make_gauge = _stats.make_gauge
 stats = _stats.stats
 time = _stats.time
 time_ns = _stats.time_ns
+
+def json_encoder(o):
+    if isinstance(o, TimingStat):
+        return o.to_dict(raw_histogram=True)
+    else:
+        raise TypeError(repr(o) + " is not JSON serializable")
 
 def gauge(name):
     def _decorator(func):
