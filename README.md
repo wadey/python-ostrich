@@ -15,8 +15,8 @@ There are three kinds of statistics that ostrich captures:
   the deltas over time. To increment a counter, use:
  
         stats.incr("births")
- 
-  or
+        
+        # or
 
         stats.incr("widgets_sold", 5)
 
@@ -28,7 +28,7 @@ There are three kinds of statistics that ostrich captures:
 
         stats.make_gauge("current_temperature", lambda: my_thermometer.get_temperature_in_celcius())
 
-  you can also create a gauge by decorating a method:
+        # you can also create a gauge by decorating a method:
 
         @stats.gauge("current_temperature")
         def current_temperature():
@@ -43,7 +43,7 @@ There are three kinds of statistics that ostrich captures:
         with stats.time("translation"):
             document.translate("de", "en")
 
-  you can also time something by decorating the method:
+        # you can also time something by decorating the method:
 
         @stats.time("translation")
         def translation():
