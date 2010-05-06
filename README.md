@@ -14,11 +14,11 @@ There are three kinds of statistics that ostrich captures:
   just click the counter each time a countable event happens, and graphing utilities usually graph
   the deltas over time. To increment a counter, use:
  
-      stats.incr("births")
+        stats.incr("births")
  
   or
 
-      stats.incr("widgets_sold", 5)
+        stats.incr("widgets_sold", 5)
 
 - gauges
 
@@ -26,13 +26,13 @@ There are three kinds of statistics that ostrich captures:
   "`current_temperature`". It's usually a measurement that you only need to take when someone asks.
   To define a gauge, stick this code somewhere in the server initialization:
 
-      stats.make_gauge("current_temperature", lambda: my_thermometer.get_temperature_in_celcius())
+        stats.make_gauge("current_temperature", lambda: my_thermometer.get_temperature_in_celcius())
 
   you can also create a gauge by decorating a method:
 
-      @stats.gauge("current_temperature")
-      def current_temperature():
-          return my_thermometer.get_temperature_in_celcius()
+        @stats.gauge("current_temperature")
+        def current_temperature():
+            return my_thermometer.get_temperature_in_celcius()
 
   Gauge methods should always return a number (either an integer or a float)
 
@@ -40,15 +40,21 @@ There are three kinds of statistics that ostrich captures:
 
   A timing is a stopwatch timer around code, like so:
 
-      with stats.time("translation"):
-          document.translate("de", "en")
+        with stats.time("translation"):
+            document.translate("de", "en")
 
   you can also time something by decorating the method:
 
-      @stats.time("translation")
-      def translation():
-          document.translate("de", "en")
+        @stats.time("translation")
+        def translation():
+            document.translate("de", "en")
 
   Timings are collected in aggregate, and the aggregation is reported through the "`stats`" command.
   The aggregation includes the count (number of timings performed), sum, maximum, minimum, average,
   standard deviation, and sum of squares (useful for aggregating the standard deviation).
+
+## Dump stats as JSON ##
+
+There is a `stats.json_encoder` function provided to make dumping that stats to JSON easy
+
+    json.dumps(stats.stats(reset=False), default=stats.json_encoder)
