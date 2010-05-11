@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(name="ostrich",
-      version="0.2",
+      version="0.2.1",
       description="Python port of the Scala Ostrich library",
       author="Wade Simmons",
       author_email="wade@wades.im",
@@ -10,4 +10,5 @@ setup(name="ostrich",
       packages = find_packages(),
       license = "Apache 2.0",
       keywords="ostrich",
+      install_requires=['decorator'],
       zip_safe = True)
