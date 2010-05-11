@@ -2,7 +2,7 @@
 
 This is a port of the Scala [Ostrich](http://github.com/robey/ostrich) library. This port is currently a work in progress, so only the stuff covered in the unit tests are considered to be completed.
 
-NOTE: This initial version is not thread safe. My first use case is inside of a Twisted server, so I don't need thread safety right now. I hope to support this in the future
+NOTE: This initial version is not thread safe. My first use case is inside of a Twisted server, so I don't need thread safety right now. I hope to support this in the future.
 
 ## Stats API ##
 
@@ -55,6 +55,14 @@ There are three kinds of statistics that ostrich captures:
 
 ## Dump stats as JSON ##
 
-There is a `stats.json_encoder` function provided to make dumping that stats to JSON easy
+There is a `stats.json_encoder` function provided to make dumping that stats to JSON easy.
 
     json.dumps(stats.stats(reset=False), default=stats.json_encoder)
+
+## Twisted Web Resource ##
+
+If you are using Twisted Web, there is a ready to use Resource available:
+
+    from ostrich.twisted import StatsResource
+
+This resource will respond to the query string parameter `reset=(0|1)`. If not specified, the default is `reset=0`.
