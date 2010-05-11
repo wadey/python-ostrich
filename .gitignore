@@ -1,1 +1,8 @@
+/.coverage
+/.coverage-results
+/_trial_temp
+/build
+/dist
+/htmlcov
+/*.egg-info
 *.pyc
