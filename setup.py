@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(name="ostrich",
-      version="0.1",
+      version="0.2",
       description="Python port of the Scala Ostrich library",
       author="Wade Simmons",
       author_email="wade@wades.im",
