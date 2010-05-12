@@ -152,13 +152,14 @@ class StatsTest(unittest.TestCase):
         self.assertEquals({"stew": 102.0}, stats.get_gauge_stats())
         self.assertEquals({"stew": 103.0}, stats.get_gauge_stats())
 
-    # TODO
-    # def test_gauge_derivative(self):
-    #     pass
-    
-    # TODO
-    # def test_fork(self):
-    #     pass
+    def test_fork(self):
+        collection = stats.fork()
+        stats.incr("widgets", 5)
+        self.assertEquals({"widgets": 5}, collection.get_counter_stats())
+        self.assertEquals({"widgets": 5}, stats.get_counter_stats(reset=True))
+        stats.incr("widgets", 5)
+        self.assertEquals({"widgets": 10}, collection.get_counter_stats())
+        self.assertEquals({"widgets": 5}, stats.get_counter_stats(reset=True))
 
 
 

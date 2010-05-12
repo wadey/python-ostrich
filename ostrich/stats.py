@@ -6,11 +6,14 @@ class Stats(StatsProvider):
     def __init__(self):
         self.gauges = {}
         self.collection = StatsCollection()
+        self.forked_collections = []
     
     def add_timing(self, name, timing):
+        map(lambda c: c.add_timing(name, timing), self.forked_collections)
         return self.collection.add_timing(name, timing)
     
     def incr(self, name, count=1):
+        map(lambda c: c.incr(name, count), self.forked_collections)
         return self.collection.incr(name, count)
     
     def get_counter_stats(self, reset=False):
@@ -23,9 +26,13 @@ class Stats(StatsProvider):
         return dict(map(lambda (k, gauge): (k, gauge()), self.gauges.items()))
     
     def get_timing(self, name):
+        # make sure any new timings get added to forked collections
+        map(lambda c: c.get_timing(name), self.forked_collections)
         return self.collection.get_timing(name)
     
     def get_counter(self, name):
+        # make sure any new counters get added to forked collections
+        map(lambda c: c.get_counter(name), self.forked_collections)
         return self.collection.get_counter(name)
     
     def stats(self, reset=False):
@@ -34,11 +41,18 @@ class Stats(StatsProvider):
         return d
     
     def clear_all(self):
+        map(lambda c: c.clear_all(), self.forked_collections)
+        del self.forked_collections[:]
         self.collection.clear_all()
         self.gauges.clear()
     
     def make_gauge(self, name, func):
         self.gauges[name] = func
+    
+    def fork(self):
+        collection = StatsCollection()
+        self.forked_collections.append(collection)
+        return collection
 
 _stats = Stats()
 add_timing = _stats.add_timing
@@ -53,6 +67,7 @@ make_gauge = _stats.make_gauge
 stats = _stats.stats
 time = _stats.time
 time_ns = _stats.time_ns
+fork = _stats.fork
 
 def json_encoder(o):
     if isinstance(o, TimingStat):
