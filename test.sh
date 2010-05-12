@@ -25,6 +25,7 @@ fi
 
 PROJNAME=`python setup.py --name`
 
+rm .coverage
 python -tt setup.py trial --reporter=bwverbose-coverage --rterrors $*
 RETVAL=$?
 echo "To see coverage details run 'coverage report' or open htmlcov/index.html."
