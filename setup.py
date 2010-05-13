@@ -29,6 +29,6 @@ setup(name="ostrich",
       keywords="ostrich",
       setup_requires=['setuptools_trial', 'setuptools_pyflakes'],
       install_requires=['decorator'],
-      tests_require=['mock']
+      tests_require=['mock'],
       classifiers=trove_classifiers,
       zip_safe = True)
