@@ -39,12 +39,12 @@ class TimeSeriesCollector(object):
             get_or_add("counter:%s" % k).add(v)
         
         for k, v in self.stats.get_timing_stats(reset=True).items():
-            data = map(v.histogram.get_percentile, [0.5, 0.75, 0.9, 0.99, 0.999, 0.9999])
-            get_or_add("timing:%s" % k, [0, 0, 0, 0, 0, 0], d=self.hourly_timings).add(data)
+            data = map(v.histogram.get_percentile, [0.5, 0.999])
+            get_or_add("timing:%s" % k, [0, 0], d=self.hourly_timings).add(data)
         
         self.last_collection = time.time()
     
-    def start_twisted(self, collect_every=5):
+    def start_twisted(self, collect_every=60):
         from twisted.internet import task
         self.task = task.LoopingCall(self.collect)
         self.task.start(collect_every)
