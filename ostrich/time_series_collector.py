@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import time
 
 from ostrich import stats
@@ -37,18 +39,27 @@ class TimeSeriesCollector(object):
             get_or_add("counter:%s" % k).add(v)
         
         for k, v in self.stats.get_timing_stats(reset=True).items():
-            data = map(v.histogram.get().get_percentile, [0.5, 0.75, 0.9, 0.99, 0.999, 0.9999])
+            data = map(v.histogram.get_percentile, [0.5, 0.75, 0.9, 0.99, 0.999, 0.9999])
             get_or_add("timing:%s" % k, [0, 0, 0, 0, 0, 0], d=self.hourly_timings).add(data)
         
         self.last_collection = time.time()
+    
+    def start_twisted(self, collect_every=5):
+        from twisted.internet import task
+        self.task = task.LoopingCall(self.collect)
+        self.task.start(collect_every)
+        return self.task
+    
+    def stop_twisted(self):
+        self.task.stop()
     
     def get(self, name):
         times = [self.last_collection + ((i - 59) * 60) for i in xrange(60)]
         if name in self.hourly:
             data = zip(times, self.hourly[name].to_list())
-            return {name: data}
         else:
-            data = zip(times, self.hourly_timings)
+            data = [[a] + b for a, b in zip(times, self.hourly_timings[name].to_list())]
+        return {name: data}
     
     def keys(self):
         return self.hourly.keys() + self.hourly_timings.keys()
