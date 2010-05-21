@@ -27,7 +27,7 @@ class TimeSeriesCollectorTest(unittest.TestCase):
         self.collector.collect()
         
         data = self.collector.get("counter:dogs")
-        self.assertEquals((my_time - (2 * 60), 0), data["counter:dogs"][57])
-        self.assertEquals((my_time - 60, 3), data["counter:dogs"][58])
-        self.assertEquals((my_time, 1), data["counter:dogs"][59])
+        self.assertEquals((my_time - (2 * 60), 0), data[57])
+        self.assertEquals((my_time - 60, 3), data[58])
+        self.assertEquals((my_time, 1), data[59])
     
