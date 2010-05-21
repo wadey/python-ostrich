@@ -1,3 +1,4 @@
+import time
 import json
 
 from twisted.web import static
@@ -12,10 +13,10 @@ class StatsResource(Resource):
         return json.dumps(stats.stats(reset=reset), default=stats.json_encoder)
 
 class StatsTimeSeriesResource(StatsResource):
-    def __init__(self):
+    def __init__(self, collect_every=60):
         Resource.__init__(self)
         self.collector = TimeSeriesCollector()
-        self.collector.start_twisted()
+        self.collector.start_twisted(collect_every=collect_every)
         
         self.putChild('graph', static.Data(GRAPH_HTML.strip(), "text/html"))
         self.putChild('graph_data', TimeSeriesDataResource(self.collector))
@@ -34,7 +35,13 @@ class TimeSeriesDataResource(Resource):
         if len(request.postpath) == 0:
             return json.dumps({'keys': self.collector.keys()}) + "\n"
         else:
-            return json.dumps(self.collector.get(request.postpath[0])) + "\n"
+            name = request.postpath[0]
+            output = "Date,%s\n" % name
+            
+            for date,value in self.collector.get(name):
+                output += "%s,%s\n" % (time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(date)), value)
+            
+            return output
 
 
 GRAPH_HTML = """
@@ -42,13 +49,11 @@ GRAPH_HTML = """
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
   <script type="text/javascript" src="http://danvk.org/dygraphs/dygraph-combined.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
   <script type="text/javascript">
     if (document.location.search.length > 0) {
-      google.load('visualization', '1');
-      google.setOnLoadCallback(drawChart);
+      $(document).ready(drawChart);
     } else {
       $.getJSON("graph_data", function(datadump) {
         var keys = datadump["keys"].sort();
@@ -58,40 +63,19 @@ GRAPH_HTML = """
         $("#graph-container").css("display", "none");
       });
     }
-    
-    function roundTo(number, digits) {
-      return Math.round(number * Math.pow(10, digits)) / Math.pow(10, digits);
-    }
 
     function drawChart() {
       var key = document.location.search.substr(1);
-      $.getJSON("graph_data/" + key, function(datadump) {
-        var rawData = datadump[key];
-        var data = new google.visualization.DataTable();
-        data.addColumn('datetime', 'Time');
-        for (i = 0; i < rawData[0].length - 1; i++) {
-          data.addColumn('number', 'Data' + i);
+      g = new Dygraph(
+        document.getElementById("chart"),
+        "graph_data/" + key,
+        {
+          //rollPeriod: 1,
+          showRoller: true,
+          customBars: true
+          //yAxisLabelWidth: 30
         }
-        data.addRows(rawData.map(function(row) { return [ new Date(row[0] * 1000) ].concat(row.slice(1)); }));
-
-        new Dygraph.GVizChart(document.getElementById('chart')).draw(data, {
-          includeZero: true,
-          fillGraph: true,
-          labelsKMG2: true,
-          xAxisLabelFormatter: function(date, granularity) { return date.strftime("%H:%M"); },
-          labelsDivStyles: { display: "none" },
-          highlightCallback: function(e, x, pts) {
-            var xloc = Math.floor(pts[pts.length - 1].canvasx) + 15;
-            var yloc = Math.floor(pts[pts.length - 1].canvasy) + 15;
-            var label = pts.map(function(p) { return roundTo(p.yval, 3); }).join(", ");
-            $('#chart_label').html(label);
-            $('#chart_label').css({ display: "block", left: xloc + "px", top: yloc + "px" });
-          },
-          unhighlightCallback: function(e) {
-            $('#chart_label').css({ display: "none" });
-          },
-        });
-      });
+      );
     }
   </script>
 </head>
@@ -99,11 +83,9 @@ GRAPH_HTML = """
 
 <div id="graph-container">
 <div id="chart" style="width: 640px; height: 320px;"></div>
-<span id="chart_label" style="position: absolute; font-size: 10pt;"></span>
 </div>
 <div id="contents"></div>
 
 </body>
 </html>
-
 """

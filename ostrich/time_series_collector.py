@@ -39,8 +39,12 @@ class TimeSeriesCollector(object):
             get_or_add("counter:%s" % k).add(v)
         
         for k, v in self.stats.get_timing_stats(reset=True).items():
-            data = map(v.histogram.get_percentile, [0.5, 0.999])
-            get_or_add("timing:%s" % k, [0, 0], d=self.hourly_timings).add(data)
+            if v.count > 0:
+                #data = map(v.histogram.get_percentile, [0.001, 0.5, 0.999])
+                data = (v.min, v.average, v.max)
+            else:
+                data = tuple()
+            get_or_add("timing:%s" % k, tuple(), d=self.hourly_timings).add(data)
         
         self.last_collection = time.time()
     
@@ -58,8 +62,8 @@ class TimeSeriesCollector(object):
         if name in self.hourly:
             data = zip(times, self.hourly[name].to_list())
         else:
-            data = [[a] + b for a, b in zip(times, self.hourly_timings[name].to_list())]
-        return {name: data}
+            data = [[a, ';'.join(map(str, b))] for a, b in zip(times, self.hourly_timings[name].to_list())]
+        return data
     
     def keys(self):
         return self.hourly.keys() + self.hourly_timings.keys()
