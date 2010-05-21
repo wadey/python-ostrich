@@ -13,7 +13,7 @@ class StatsProvider(object):
         When using nanoseconds, be sure to encode your field with that fact. Consider
         using the suffix `_ns` in your field.
         """
-        return Timer(self, name)
+        return Timer(self, name, nano=True)
     
     def stats(self, reset=False):
         return dict(counters=self.get_counter_stats(reset), timings=self.get_timing_stats(reset))
