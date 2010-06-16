@@ -1,3 +1,15 @@
+python-ostrich (0.2.3-sg15) lucid; urgency=low
+
+  [ Ian Eure ]
+  * Move setuptools_trial to tests_require.
+  * Build-depend on setuptools.
+  * Move setuptools_trial to tests_require.
+  * Ignore xunit.xml
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 16 Jun 2010 20:13:21 +0000
+
 python-ostrich (0.2.3-sg0) unstable; urgency=low
 
   * Debianized.
