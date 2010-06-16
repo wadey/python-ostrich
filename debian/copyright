@@ -1,0 +1,23 @@
+This work was packaged for Debian by:
+
+    Ian Eure <ian@simplegeo.com> on Wed, 16 Jun 2010 11:48:33 -0700
+
+It was downloaded from http://github.com/wadey/python-ostrich
+
+Upstream Author(s):
+
+    Wade Simmons <wade@wades.im>
+
+Copyright:
+
+    Copyright (C) 2010, Wade Simmons
+
+License:
+
+    Apache License 2.0.
+
+The Debian packaging is:
+
+    Copyright (C) 2010 Ian Eure <ian@simplegeo.com>
+
+and is licensed under the BSD license, see `/usr/share/common-licenses/BSD.

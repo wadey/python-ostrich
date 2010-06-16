@@ -1,0 +1,15 @@
+Source: python-ostrich
+Section: python
+Priority: extra
+Maintainer: SimpleGeo Nerds <nerds@simplegeo.com>
+Uploaders: Ian Eure <ian@simplegeo.com>, Wade Simmons <wade@wades.im>
+Build-Depends: cdbs, debhelper (>= 7), python, python-support, pyflakes
+Standards-Version: 3.8.4
+Homepage: http://github.com/wadey/python-ostrich
+
+Package: python-ostrich
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, python, python-decorator
+Description: A Python port of the Scala Ostrich library
+ This port is currently a work in progress, so only the stuff covered
+ in the unit tests are considered to be completed.

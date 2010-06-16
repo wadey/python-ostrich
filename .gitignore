@@ -5,4 +5,5 @@
 /dist
 /htmlcov
 /*.egg-info
+/*.egg
 *.pyc
