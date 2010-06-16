@@ -1,3 +1,12 @@
+python-ostrich (0.2.3-sg20) lucid; urgency=low
+
+  [ Ian Eure ]
+  * Record test coverage back to the workspace
+
+  [ SimpleGeo Nerds ]
+
+ -- SimpleGeo Nerds <nerds@simplegeo.com>  Wed, 16 Jun 2010 22:54:59 +0000
+
 python-ostrich (0.2.3-sg15) lucid; urgency=low
 
   [ Ian Eure ]
