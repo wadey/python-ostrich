@@ -9,7 +9,7 @@ Homepage: http://github.com/wadey/python-ostrich
 
 Package: python-ostrich
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, python, python-decorator
+Depends: ${shlibs:Depends}, ${misc:Depends}, python, python-decorator, python-twisted
 Description: A Python port of the Scala Ostrich library
  This port is currently a work in progress, so only the stuff covered
  in the unit tests are considered to be completed.
