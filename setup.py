@@ -28,6 +28,6 @@ setup(name="ostrich",
       license = "Apache 2.0",
       keywords="ostrich",
       install_requires=['decorator', 'Twisted'],
-      tests_require=['setuptools_pyflakes', 'coverage', 'nose', 'mock'],
+      tests_require=['coverage', 'nose', 'mock'],
       classifiers=trove_classifiers,
       zip_safe = True)

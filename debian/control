@@ -3,7 +3,7 @@ Section: python
 Priority: extra
 Maintainer: SimpleGeo Nerds <nerds@simplegeo.com>
 Uploaders: Ian Eure <ian@simplegeo.com>, Wade Simmons <wade@wades.im>
-Build-Depends: cdbs, debhelper (>= 7), python, python-support, python-setuptools, pyflakes
+Build-Depends: cdbs, debhelper (>= 7), python, python-support, python-setuptools, pyflakes, python-nose, python-twisted, python-coverage, python-decorator, python-mock, pyflakes
 Standards-Version: 3.8.4
 Homepage: http://github.com/wadey/python-ostrich
 
