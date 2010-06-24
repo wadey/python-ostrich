@@ -9,7 +9,7 @@ include /usr/share/cdbs/1/class/python-distutils.mk
 
 # Add here any variable or target overrides you need.
 
-build/python-poster::
+build/python-ostrich::
 	python setup.py nosetests \
         --with-xunit --xunit-file $(ARTIFACTS)/xunit.xml \
         --with-coverage --cover-branch --cover-tests \
