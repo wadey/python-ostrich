@@ -9,9 +9,12 @@ include /usr/share/cdbs/1/class/python-distutils.mk
 
 # Add here any variable or target overrides you need.
 
-check::
-	pyflakes ostrich
-	python setup.py nosetests --cover-html-dir $(ARTIFACTS)/htmlcov \
-                              --xunit-file $(ARTIFACTS)/xunit.xml
-
-configure/python-ostrich:: check
+build/python-poster::
+	python setup.py nosetests \
+        --with-xunit --xunit-file $(ARTIFACTS)/xunit.xml \
+        --with-coverage --cover-branch --cover-tests \
+        --cover-outfile $(ARTIFACTS)/coverage.xml \
+        --cover-report html --cover-directory $(ARTIFACTS)/htmlcov
+	# The plugin doesn't actually generate the XML report for some
+	# reaspn, so explicitly do it here.
+	python-coverage xml -o $(ARTIFACTS)/coverage.xml
