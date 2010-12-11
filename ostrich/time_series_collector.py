@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import time
 
 from ostrich import stats
+from ostrich.timing import Timing
 
 class TimeSeries(object):
     def __init__(self, size, empty=0):
@@ -39,12 +40,7 @@ class TimeSeriesCollector(object):
             get_or_add("counter:%s" % k).add(v)
         
         for k, v in self.stats.get_timing_stats(reset=True).items():
-            if v.count > 0:
-                #data = map(v.histogram.get_percentile, [0.001, 0.5, 0.999])
-                data = (v.min, v.average, v.max)
-            else:
-                data = tuple()
-            get_or_add("timing:%s" % k, tuple(), d=self.hourly_timings).add(data)
+            get_or_add("timing:%s" % k, None, d=self.hourly_timings).add(v)
         
         self.last_collection = time.time()
     
@@ -56,14 +52,25 @@ class TimeSeriesCollector(object):
     
     def stop_twisted(self):
         self.task.stop()
+
+    def get_combined(self, name):
+        if name in self.hourly:
+            return self.hourly[name]
+        else:
+            timing = Timing()
+            timing.add(self.stats.get_timing(name[7:]).get())
+            if name in self.hourly_timings:
+                for v in self.hourly_timings[name].to_list():
+                    if v:
+                        timing.add(v)
+            return timing.get()
     
     def get(self, name):
         times = [self.last_collection + ((i - 59) * 60) for i in xrange(60)]
         if name in self.hourly:
-            data = zip(times, self.hourly[name].to_list())
+            return zip(times, self.hourly[name].to_list())
         else:
-            data = [[a, ';'.join(map(str, b))] for a, b in zip(times, self.hourly_timings[name].to_list())]
-        return data
+            return zip(times, self.hourly_timings[name].to_list())
     
     def keys(self):
         return self.hourly.keys() + self.hourly_timings.keys()
