@@ -54,9 +54,12 @@ class TimeSeriesCollector(object):
         self.task.stop()
 
     def get_combined(self, name):
-        if name in self.hourly:
-            return self.hourly[name]
-        else:
+        if name.startswith("counter:"):
+            counter = self.stats.get_counter(name[8:]).get()
+            if name in self.hourly:
+                counter += sum(self.hourly[name].to_list())
+            return counter
+        elif name.startswith("timing:"):
             timing = Timing()
             timing.add(self.stats.get_timing(name[7:]).get())
             if name in self.hourly_timings:
@@ -64,6 +67,8 @@ class TimeSeriesCollector(object):
                     if v:
                         timing.add(v)
             return timing.get()
+        else:
+            raise NotImplemented("Only counters and timings supported")
     
     def get(self, name):
         times = [self.last_collection + ((i - 59) * 60) for i in xrange(60)]

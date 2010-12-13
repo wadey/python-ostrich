@@ -68,7 +68,9 @@ class TimeSeriesCombinedResource(Resource):
     
     def render_GET(self, request):
         if len(request.postpath) == 0:
-            data = dict((name, self.collector.get_combined("timing:%s" % name).to_dict()) for name in self.collector.stats.timings.keys())
+            data = {}
+            data['timings'] = dict((name, self.collector.get_combined("timing:%s" % name).to_dict()) for name in self.collector.stats.timings.keys())
+            data['counters'] = dict((name, self.collector.get_combined("counter:%s" % name)) for name in self.collector.stats.counters.keys())
             return respond(request, data)
         else:
             name = request.postpath[0]
