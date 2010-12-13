@@ -17,7 +17,7 @@ class Timing(object):
         self.min = sys.maxint
         self.count = 0
         self.histogram.clear()
-    
+
     def add(self, n):
         if isinstance(n, TimingStat):
             return self.add_timing_stat(n)
@@ -107,6 +107,9 @@ class TimingStat(object):
                     histogram = histogram[:-1]
                 d.update(histogram=histogram)
         return d
+
+    def __repr__(self):
+        return self.__str__()
     
     def __str__(self):
         return "(" + ", ".join(["%s=%d" % (k, v) for k, v in sorted(self.to_dict().items())]) + ")"
