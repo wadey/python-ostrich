@@ -47,23 +47,20 @@ class TimeSeriesDataResource(Resource):
     
     def render_GET(self, request):
         if len(request.postpath) == 0:
-            return json.dumps({'keys': self.collector.keys(), 'stats': self.collector.stats.stats()}, default=stats.json_encoder) + "\n"
+            return respond(request, {'keys': self.collector.keys(), 'stats': self.collector.stats.stats()})
         else:
             def convert(v):
                 if isinstance(v, TimingStat):
-                    return ';'.join(map(str, [v.min, v.average, v.max]))
+                    return v.to_dict()
                 return v
 
             name = '/'.join(request.postpath)
-            output = "Date,%s\n" % name
             
             try:
-                for date, value in self.collector.get(name):
-                    output += "%s,%s\n" % (time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(date)), convert(value) or '')
+                output = [(date, convert(value)) for date, value in self.collector.get(name)]
             except KeyError:
                 return respond(request, dict(code=404, error="Not Found"), code=404);
-            
-            return output
+            return respond(request, output)
 
 class TimeSeriesCombinedResource(Resource):
     isLeaf = True
