@@ -8,12 +8,14 @@ from ostrich import stats
 from ostrich.time_series_collector import TimeSeriesCollector
 from ostrich.timing import TimingStat
 
-def respond(request, data):
+def respond(request, data, code=200):
     data = json.dumps(data, default=stats.json_encoder)
     if 'callback' in request.args:
+        request.setResponseCode(200)
         request.setHeader('Content-Type', 'application/javascript')
         return request.args['callback'][0] + "(" + data + ")\n"
     else:
+        request.setResponseCode(code)
         request.setHeader('Content-Type', 'application/json')
         return data + "\n"
 
@@ -52,11 +54,14 @@ class TimeSeriesDataResource(Resource):
                     return ';'.join(map(str, [v.min, v.average, v.max]))
                 return v
 
-            name = request.postpath[0]
+            name = '/'.join(request.postpath)
             output = "Date,%s\n" % name
             
-            for date, value in self.collector.get(name):
-                output += "%s,%s\n" % (time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(date)), convert(value) or '')
+            try:
+                for date, value in self.collector.get(name):
+                    output += "%s,%s\n" % (time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(date)), convert(value) or '')
+            except KeyError:
+                return respond(request, dict(code=404, error="Not Found"), code=404);
             
             return output
 
@@ -73,8 +78,11 @@ class TimeSeriesCombinedResource(Resource):
             data['counters'] = dict((name, self.collector.get_combined("counter:%s" % name)) for name in self.collector.stats.counters.keys())
             return respond(request, data)
         else:
-            name = request.postpath[0]
-            data = self.collector.get_combined(name).to_dict()
+            name = '/'.join(request.postpath)
+            try:
+                data = self.collector.get_combined(name).to_dict()
+            except KeyError:
+                return respond(request, dict(code=404, error="Not Found"), code=404);
             return respond(request, data)
 
 GRAPH_HTML = """
