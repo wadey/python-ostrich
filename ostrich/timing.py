@@ -93,6 +93,17 @@ class TimingStat(object):
     def __eq__(self, other):
         return self.count == other.count and self.max == other.max and \
                self.min == other.min and self.average == other.average and self.variance == other.variance
+
+    def to_raw_dict(self, histogram=False):
+        d = dict(count=self.count, max=self.max, min=self.min,
+                 mean=self.mean, partial_variance=self.partial_variance)
+        if histogram and self.histogram:
+            # strip off all the zeros at the end of the histogram
+            histogram = list(self.histogram.buckets)
+            while histogram and histogram[-1] == 0:
+                histogram = histogram[:-1]
+            d['histogram'] = histogram
+        return d
     
     def to_dict_no_histogram(self):
         return dict(count=self.count, maximum=self.max, minimum=self.min,
@@ -116,6 +127,10 @@ class TimingStat(object):
                     histogram = histogram[:-1]
                 d.update(histogram=histogram)
         return d
+
+    @classmethod
+    def from_raw_dict(cls, d):
+        return TimingStat(d['count'], d['maximum'], d['minimum'], d['average'], d['partial_variance'])
 
     def __repr__(self):
         return self.__str__()

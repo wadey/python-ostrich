@@ -69,6 +69,15 @@ time = _stats.time
 time_ns = _stats.time_ns
 fork = _stats.fork
 
+def raw_json_encoder(o):
+    """Use this encoder if you will be merging the data back in to another
+    ostrich.stats collector with TimingStat.from_raw_dict
+    """
+    if isinstance(o, TimingStat):
+        return o.to_raw_dict(histogram=False)
+    else:
+        raise TypeError(repr(o) + " is not JSON serializable")
+
 def json_encoder(o):
     if isinstance(o, TimingStat):
         return o.to_dict(raw_histogram=True)
