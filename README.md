@@ -1,6 +1,6 @@
 # python-ostrich
 
-This is a port of the Scala [Ostrich](http://github.com/robey/ostrich) library. This port is currently a work in progress, so only the stuff covered in the unit tests are considered to be completed.
+This is a port of the Scala [Ostrich](http://github.com/twitter/ostrich) library. This port is currently a work in progress, so only the stuff covered in the unit tests are considered to be completed.
 
 ## Stats API ##
 
