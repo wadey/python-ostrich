@@ -1,5 +1,6 @@
 import sys
 import math
+import threading
 
 from ostrich.histogram import Histogram
 
@@ -11,12 +12,14 @@ class Timing(object):
         self.histogram = Histogram()
         self.mean = 0.0
         self.partial_variance = 0.0
+        self.lock = threading.Lock()
     
     def clear(self):
-        self.max = 0
-        self.min = sys.maxint
-        self.count = 0
-        self.histogram.clear()
+        with self.lock:
+            self.max = 0
+            self.min = sys.maxint
+            self.count = 0
+            self.histogram.clear()
 
     def add(self, n):
         if isinstance(n, TimingStat):
@@ -25,44 +28,50 @@ class Timing(object):
             return self.add_duration(n)
     
     def add_duration(self, n):
-        if n > -1:
-            self.max = max(self.max, n)
-            self.min = min(self.min, n)
-            self.count += 1
-            self.histogram.add(n)
-            if self.count == 1:
-                self.mean = float(n)
-                self.partial_variance = 0.0
+        with self.lock:
+            if n > -1:
+                self.max = max(self.max, n)
+                self.min = min(self.min, n)
+                self.count += 1
+                self.histogram.add(n)
+                if self.count == 1:
+                    self.mean = float(n)
+                    self.partial_variance = 0.0
+                else:
+                    new_mean = self.mean + (n - self.mean) / self.count
+                    self.partial_variance += (n - self.mean) * (n - new_mean)
+                    self.mean = new_mean
             else:
-                new_mean = self.mean + (n - self.mean) / self.count
-                self.partial_variance += (n - self.mean) * (n - new_mean)
-                self.mean = new_mean
-        else:
-            # TODO: warning?
-            pass
-        return self.count
+                # TODO: warning?
+                pass
+            return self.count
     
     def add_timing_stat(self, timing_stat):
-        if timing_stat.count > 0:
-            # (comment from Scala ostrich) these equations end up using the sum again, and may be lossy. i couldn't find or think of
-            # a better way.
-            new_mean = (self.mean * self.count + timing_stat.mean * timing_stat.count) / (self.count + timing_stat.count)
-            self.partial_variance = self.partial_variance + timing_stat.partial_variance + \
-                                    (self.mean - new_mean) * self.mean * self.count + \
-                                    (timing_stat.mean - new_mean) * timing_stat.mean * timing_stat.count
-            self.mean = new_mean
-            self.count += timing_stat.count
-            self.max = max(self.max, timing_stat.max)
-            self.min = min(self.min, timing_stat.min)
-            if timing_stat.histogram is not None:
-                self.histogram.merge(timing_stat.histogram)
+        with self.lock:
+            if timing_stat.count > 0:
+                # (comment from Scala ostrich) these equations end up using the sum again, and may be lossy. i couldn't find or think of
+                # a better way.
+                new_mean = (self.mean * self.count + timing_stat.mean * timing_stat.count) / (self.count + timing_stat.count)
+                self.partial_variance = self.partial_variance + timing_stat.partial_variance + \
+                                        (self.mean - new_mean) * self.mean * self.count + \
+                                        (timing_stat.mean - new_mean) * timing_stat.mean * timing_stat.count
+                self.mean = new_mean
+                self.count += timing_stat.count
+                self.max = max(self.max, timing_stat.max)
+                self.min = min(self.min, timing_stat.min)
+                if timing_stat.histogram is not None:
+                    self.histogram.merge(timing_stat.histogram)
     
     def get(self, reset=False):
-        try:
-            return TimingStat(self.count, self.max, self.min, self.mean, self.partial_variance, self.histogram.clone())
-        finally:
-            if reset:
-                self.clear()
+        with self.lock:
+            try:
+                return TimingStat(self.count, self.max, self.min, self.mean, self.partial_variance, self.histogram.clone())
+            finally:
+                if reset:
+                    self.max = 0
+                    self.min = sys.maxint
+                    self.count = 0
+                    self.histogram.clear()
 
 class TimingStat(object):
     """A pre-calculated timing. If you have timing stats from an external source but
