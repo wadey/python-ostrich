@@ -4,6 +4,7 @@ import time
 
 from ostrich import stats
 from ostrich.timing import Timing, TimingStat
+from ostrich.histogram import Histogram
 
 class TimeSeries(object):
     def __init__(self, size, empty=0):
@@ -75,7 +76,7 @@ class TimeSeriesCollector(object):
         if name in self.hourly:
             return zip(times, self.hourly[name].to_list())
         else:
-            return zip(times, [v or TimingStat() for v in self.hourly_timings[name].to_list()])
+            return zip(times, [v or TimingStat(histogram=Histogram()) for v in self.hourly_timings[name].to_list()])
     
     def keys(self):
         return self.hourly.keys() + self.hourly_timings.keys()
