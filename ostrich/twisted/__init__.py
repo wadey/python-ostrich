@@ -1,4 +1,3 @@
-import time
 import json
 
 from twisted.web import static
