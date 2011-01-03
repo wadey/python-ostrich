@@ -75,7 +75,7 @@ class TimeSeriesCollector(object):
         if name in self.hourly:
             return zip(times, self.hourly[name].to_list())
         else:
-            return zip(times, self.hourly_timings[name].to_list())
+            return zip(times, [v or TimingStat() for v in self.hourly_timings[name].to_list()))
     
     def keys(self):
         return self.hourly.keys() + self.hourly_timings.keys()

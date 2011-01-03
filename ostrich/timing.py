@@ -85,7 +85,7 @@ class TimingStat(object):
        
     Partial variance is `(count - 1)(s^2)`, or `sum(x^2) - sum(x) * mean`.
     """
-    def __init__(self, count, max, min, mean=0.0, partial_variance=0.0, histogram=None):
+    def __init__(self, count=0, max=0, min=0, mean=0.0, partial_variance=0.0, histogram=None):
         self.count = count
         self.min = min if count > 0 else 0
         self.max = max if count > 0 else 0
