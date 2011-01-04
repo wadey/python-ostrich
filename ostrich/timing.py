@@ -136,7 +136,7 @@ class TimingStat(object):
 
     @classmethod
     def from_raw_dict(cls, d):
-        return TimingStat(d['count'], d['maximum'], d['minimum'], d['average'], d['partial_variance'])
+        return TimingStat(d['count'], d['max'], d['min'], d['mean'], d['partial_variance'])
 
     def __repr__(self):
         return self.__str__()
