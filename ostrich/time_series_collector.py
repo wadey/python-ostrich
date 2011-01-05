@@ -72,11 +72,15 @@ class TimeSeriesCollector(object):
             raise NotImplemented("Only counters and timings supported")
     
     def get(self, name):
-        times = [self.last_collection + ((i - 59) * 60) for i in xrange(60)]
-        if name in self.hourly:
-            return zip(times, self.hourly[name].to_list())
+        times = [int(self.last_collection + ((i - 59) * 60)) for i in xrange(60)]
+        if name.startswith("counter:"):
+            return zip(times, self.hourly.get(name, TimeSeries(60, 0)).to_list()) \
+                    + [(time.time(), self.stats.get_counter(name[8:]).get())]
+        elif name.startswith("timing:"):
+            return zip(times, [v or TimingStat(histogram=Histogram()) for v in self.hourly_timings.get(name, TimeSeries(60, None)).to_list()]) \
+                    + [(time.time(), self.stats.get_timing(name[7:]).get())]
         else:
-            return zip(times, [v or TimingStat(histogram=Histogram()) for v in self.hourly_timings[name].to_list()])
+            raise NotImplemented("Only counters and timings supported")
     
     def keys(self):
         return self.hourly.keys() + self.hourly_timings.keys()
