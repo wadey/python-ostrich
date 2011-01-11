@@ -135,8 +135,11 @@ class TimingStat(object):
         return d
 
     @classmethod
-    def from_raw_dict(cls, d):
-        return TimingStat(d['count'], d['max'], d['min'], d['mean'], d['partial_variance'])
+    def from_raw_dict(cls, d, bucket_offsets=None):
+        histogram = None
+        if d.has_key('histogram'):
+            histogram = Histogram.from_list(d['histogram'], bucket_offsets)
+        return TimingStat(d['count'], d['max'], d['min'], d['mean'], d['partial_variance'], histogram)
 
     def __repr__(self):
         return self.__str__()

@@ -74,7 +74,7 @@ def raw_json_encoder(o):
     ostrich.stats collector with TimingStat.from_raw_dict
     """
     if isinstance(o, TimingStat):
-        return o.to_raw_dict(histogram=False)
+        return o.to_raw_dict(histogram=True)
     else:
         raise TypeError(repr(o) + " is not JSON serializable")
 

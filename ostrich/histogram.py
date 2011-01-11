@@ -31,11 +31,27 @@ class Histogram(object):
         if values:
             for val in values:
                 self.add(val)
+
+    @classmethod
+    def from_list(cls, buckets, bucket_offsets=None):
+        """This method will be lossy if the bucket_offsets are different"""
+        if not bucket_offsets:
+            bucket_offsets = cls.BUCKET_OFFSETS
+        h = cls()
+        if bucket_offsets == cls.BUCKET_OFFSETS:
+            for i, v in enumerate(buckets):
+                h.buckets[i] = v
+            h.total = sum(buckets)
+        else:
+            for i, v in enumerate(buckets):
+                # hack because binary_search does an exclusive max
+                h.add(bucket_offsets[i]-1, v)
+        return h
     
-    def add(self, n):
+    def add(self, n, count=1):
         index = self.binary_search(n)
-        self.buckets[index] += 1
-        self.total += 1
+        self.buckets[index] += count
+        self.total += count
     
     def clear(self):
         for i in range(self.num_buckets):
