@@ -54,12 +54,18 @@ class TimeSeriesDataResource(Resource):
                 return v
 
             name = '/'.join(request.postpath)
-            
+
+            output = {}
             try:
-                output = [(date, convert(value)) for date, value in self.collector.get(name)]
+                for n in name.split(','):
+                    output[n] = [(date, convert(value)) for date, value in self.collector.get(n)]
             except KeyError:
                 return respond(request, dict(code=404, error="Not Found"), code=404);
-            return respond(request, output)
+
+            if ',' in name:
+                return respond(request, output)
+            else:
+                return respond(request, output[name])
 
 class TimeSeriesCombinedResource(Resource):
     isLeaf = True
@@ -75,11 +81,18 @@ class TimeSeriesCombinedResource(Resource):
             return respond(request, data)
         else:
             name = '/'.join(request.postpath)
+
+            data = {}
             try:
-                data = self.collector.get_combined(name).to_dict()
+                for n in name.split(','):
+                    data[n] = self.collector.get_combined(name).to_dict()
             except KeyError:
                 return respond(request, dict(code=404, error="Not Found"), code=404);
-            return respond(request, data)
+
+            if ',' in name:
+                return respond(request, data)
+            else:
+                return respond(request, data[name])
 
 GRAPH_HTML = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
