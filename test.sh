@@ -16,13 +16,6 @@ if [ ${RETVAL} != 0 ] ; then
     exit ${RETVAL}
 fi
 
-python -tt setup.py flakes
-RETVAL=$?
-if [ ${RETVAL} != 0 ] ; then
-    echo "FAILED: pyflakes reported warnings -- exiting"
-    exit ${RETVAL}
-fi
-
 PROJNAME=`python setup.py --name`
 
 rm .coverage
