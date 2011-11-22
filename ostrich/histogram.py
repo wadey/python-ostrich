@@ -1,3 +1,4 @@
+from bisect import bisect
 import sys
 
 class Histogram(object):
@@ -5,25 +6,6 @@ class Histogram(object):
           322, 418, 543, 706, 918, 1193, 1551, 2016, 2620, 3406, 4428, 5757, 7483,
           9728, 12647, 16441, 21373, 27784, 36119, 46955, 61041, 79354, 103160, 134107,
           174339, 226641, 294633, 383023, 497930, 647308, 841501, 1093951]
-    
-    @classmethod
-    def _binary_search(cls, array, key, low, high):
-        if low > high:
-            return low
-        else:
-            mid = (low + high + 1) >> 1
-            mid_val = array[mid]
-            if mid_val < key:
-                return cls._binary_search(array, key, mid + 1, high)
-            elif mid_val > key:
-                return cls._binary_search(array, key, low, mid - 1)
-            else:
-                # exactly equal to this bucket's value. but the value is an exclusive max, so bump it up.
-                return mid + 1
-    
-    @classmethod
-    def binary_search(cls, key):
-        return cls._binary_search(cls.BUCKET_OFFSETS, key, 0, len(cls.BUCKET_OFFSETS) - 1)
     
     def __init__(self, *values):
         self.num_buckets = len(self.BUCKET_OFFSETS) + 1
@@ -50,7 +32,7 @@ class Histogram(object):
         return h
     
     def add(self, n, count=1):
-        index = self.binary_search(n)
+        index = bisect(self.BUCKET_OFFSETS, n)
         self.buckets[index] += count
         self.total += count
     
