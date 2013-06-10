@@ -17,7 +17,7 @@ trove_classifiers=[
     ]
 
 setup(name="ostrich",
-      version="0.3.8",
+      version="0.3.9",
       description="Python port of the Scala Ostrich library",
       author="Wade Simmons",
       author_email="wade@wades.im",
