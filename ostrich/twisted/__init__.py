@@ -74,10 +74,11 @@ class TimeSeriesCombinedResource(Resource):
         self.collector = collector
     
     def render_GET(self, request):
+        series = request.args.get('series', ['false'])[0] == 'true'
         if len(request.postpath) == 0:
             data = {}
             data['timings'] = dict((name, self.collector.get_combined("timing:%s" % name).to_dict()) for name in self.collector.stats.timings.keys())
-            data['counters'] = dict((name, self.collector.get_combined("counter:%s" % name)) for name in self.collector.stats.counters.keys())
+            data['counters'] = dict((name, self.collector.get_combined("counter:%s" % name, series=series)) for name in self.collector.stats.counters.keys())
             return respond(request, data)
         else:
             name = '/'.join(request.postpath)
@@ -85,7 +86,7 @@ class TimeSeriesCombinedResource(Resource):
             data = {}
             try:
                 for n in name.split(','):
-                    data[n] = self.collector.get_combined(name).to_dict()
+                    data[n] = self.collector.get_combined(name, series=series).to_dict()
             except KeyError:
                 return respond(request, dict(code=404, error="Not Found"), code=404);
 

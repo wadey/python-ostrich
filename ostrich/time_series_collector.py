@@ -54,12 +54,15 @@ class TimeSeriesCollector(object):
     def stop_twisted(self):
         self.task.stop()
 
-    def get_combined(self, name):
+    def get_combined(self, name, series=False):
         if name.startswith("counter:"):
-            counter = self.stats.get_counter(name[8:]).get()
-            if name in self.hourly:
-                counter += sum(self.hourly[name].to_list())
-            return counter
+            if series:
+                return self.get(name)
+            else:
+                counter = self.stats.get_counter(name[8:]).get()
+                if name in self.hourly:
+                    counter += sum(self.hourly[name].to_list())
+                return counter
         elif name.startswith("timing:"):
             timing = Timing()
             timing.add(self.stats.get_timing(name[7:]).get())
